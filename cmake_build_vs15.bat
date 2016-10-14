@@ -1,4 +1,8 @@
 echo off
+<<<<<<< HEAD
+=======
+FOR %%I IN (.) DO SET CurrDirName=%%~nI%%~xI
+>>>>>>> sam/master
 where /q cmake
 IF %ERRORLEVEL%==1 (
     Echo cmake not in path
@@ -11,10 +15,17 @@ IF %ERRORLEVEL%==1 (
     Echo Couldn't find cmake.exe
 ) ELSE ( 
    echo Cmake building for VS2015 Win64
+<<<<<<< HEAD
    cd .. 
 	mkdir pba_build
 	cd pba_build
    cmake -G "Visual Studio 14 2015 Win64" ../enu_pba
+=======
+   cd ..
+   mkdir %CurrDirName%_build
+   cd %CurrDirName%_build
+   cmake -G "Visual Studio 14 2015 Win64" ../%CurrDirName%/
+>>>>>>> sam/master
    echo cmake complete, open the sln in the build dir
  )
 pause > nul
