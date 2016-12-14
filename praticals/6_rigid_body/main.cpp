@@ -1,5 +1,6 @@
 #include "game.h"
 #include "physics.h"
+#include "cPhysicsComponents.h"
 #include <glm/glm.hpp>
 #include <glm/gtx/rotate_vector.hpp>
 #include <graphics_framework.h>
@@ -14,10 +15,11 @@ using namespace glm;
 static vector<unique_ptr<Entity>> SceneList;
 static unique_ptr<Entity> floorEnt;
 
+
 unique_ptr<Entity> CreateParticle() {
   unique_ptr<Entity> ent(new Entity());
-  ent->SetPosition(vec3(0, 5.0 + (double)(rand() % 200) / 20.0, 0));
-  unique_ptr<Component> physComponent(new cPhysics());
+  ent->SetPosition(vec3(-2.0, 5.0 + (double)(rand() % 200) / 20.0,2.0));
+  unique_ptr<Component> physComponent(new cParticle());
   unique_ptr<cShapeRenderer> renderComponent(new cShapeRenderer(cShapeRenderer::SPHERE));
   renderComponent->SetColour(phys::RandomColour());
   ent->AddComponent(physComponent);
@@ -25,11 +27,47 @@ unique_ptr<Entity> CreateParticle() {
   ent->AddComponent(unique_ptr<Component>(move(renderComponent)));
   return ent;
 }
+unique_ptr<Entity> CreateBox(const vec3 &position) {
+  unique_ptr<Entity> ent(new Entity());
+  ent->SetPosition(position);
+  ent->SetRotation(angleAxis(0.0f, vec3(1, 0, 0)));
+  unique_ptr<Component> physComponent(new cRigidCube());
+  unique_ptr<cShapeRenderer> renderComponent(new cShapeRenderer(cShapeRenderer::BOX));
+  renderComponent->SetColour(phys::RandomColour());
+  ent->AddComponent(physComponent);
+  ent->SetName("Cuby");
+  ent->AddComponent(unique_ptr<Component>(new cBoxCollider()));
+  ent->AddComponent(unique_ptr<Component>(move(renderComponent)));
+
+  return ent;
+}
+
+unique_ptr<Entity> CreateCylinder(const vec3 &position, float dia, float height) {
+	unique_ptr<Entity> ent(new Entity());
+	ent->SetPosition(position);
+	ent->SetRotation(angleAxis(0.0f, vec3(1, 0, 0)));
+	ent->SetHeightm(height);
+	ent->SetDiam(dia);
+	unique_ptr<Component> physComponent(new cRigidCylinder());
+	unique_ptr<cShapeRenderer> renderComponent(new cShapeRenderer(cShapeRenderer::CYLINDER));
+	renderComponent->SetColour(phys::RandomColour());
+	ent->AddComponent(physComponent);
+	ent->SetName("Cyl");
+	ent->AddComponent(unique_ptr<Component>(new cCylinderCollider()));
+	ent->AddComponent(unique_ptr<Component>(move(renderComponent)));
+
+	return ent;
+}
+
+
+
 
 bool update(double delta_time) {
   static double t = 0.0;
   static double accumulator = 0.0;
   accumulator += delta_time;
+
+
 
   while (accumulator > physics_tick) {
     UpdatePhysics(t, physics_tick);
@@ -47,12 +85,15 @@ bool update(double delta_time) {
 
 bool load_content() {
   phys::Init();
-  for (size_t i = 0; i < 4; i++) {
-    SceneList.push_back(move(CreateParticle()));
-  }
+
+ //SceneList.push_back(move(CreateCylinder({ 0, 12, 0 },2.0f, 10.0f)));
+ //SceneList.push_back(move(CreateParticle()));
+
+  
   floorEnt = unique_ptr<Entity>(new Entity());
   floorEnt->AddComponent(unique_ptr<Component>(new cPlaneCollider()));
-
+  floorEnt->SetName("Floor");
+  
   phys::SetCameraPos(vec3(20.0f, 10.0f, 20.0f));
   phys::SetCameraTarget(vec3(0, 10.0f, 0));
   InitPhysics();
