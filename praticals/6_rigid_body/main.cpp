@@ -1,5 +1,6 @@
 #include "game.h"
 #include "physics.h"
+#include "LSystem.cpp"
 #include "cPhysicsComponents.h"
 #include <glm/glm.hpp>
 #include <glm/gtx/rotate_vector.hpp>
@@ -14,6 +15,7 @@ using namespace glm;
 
 static vector<unique_ptr<Entity>> SceneList;
 static unique_ptr<Entity> floorEnt;
+LSystem tree;
 
 
 unique_ptr<Entity> CreateParticle() {
@@ -75,7 +77,7 @@ bool update(double delta_time) {
     t += physics_tick;
   }
 
-  for (auto &e : SceneList) {
+  for (auto &e : Llist) {
     e->Update(delta_time);
   }
 
@@ -86,10 +88,14 @@ bool update(double delta_time) {
 bool load_content() {
   phys::Init();
 
- //SceneList.push_back(move(CreateCylinder({ 0, 12, 0 },2.0f, 10.0f)));
- //SceneList.push_back(move(CreateParticle()));
 
-  
+ //SceneList.push_back(move(CreateCylinder({ 0, 12, 0 },2.0f, 10.0f)));
+  tree.object();
+ //tree.simulate();
+ 
+ //Llist.push_back(move(CreateParticle()));
+
+
   floorEnt = unique_ptr<Entity>(new Entity());
   floorEnt->AddComponent(unique_ptr<Component>(new cPlaneCollider()));
   floorEnt->SetName("Floor");
@@ -101,9 +107,11 @@ bool load_content() {
 }
 
 bool render() {
-  for (auto &e : SceneList) {
+  for (auto &e : Llist) 
+  {
     e->Render();
   }
+
   phys::DrawScene();
   return true;
 }

@@ -16,10 +16,11 @@ using namespace graphics_framework;
 using namespace std;
 using namespace glm;
 
+static vector<unique_ptr<Entity>> Llist;
+
 class LSystem
 {
 
-	static vector<unique_ptr<Entity>> SceneList;
 	int iterations = 4;
 	float angle = 22.5f;
 	SceneGraph base;
@@ -32,6 +33,21 @@ class LSystem
 
 	std::string axiom = "F";
 	std::string rule1 = "FF-[-F+F+F]+[+F-F-F]";
+
+
+
+public:
+
+	
+	
+
+	LSystem()
+	{
+
+	}
+
+	
+
 
 
 	unique_ptr<Entity> CreateCylinder(const vec3 &position, float dia, float height)
@@ -56,7 +72,6 @@ class LSystem
 
 
 
-
 	LSystem::~LSystem()
 	{
 	}
@@ -69,17 +84,17 @@ class LSystem
 
 		if (nodes.size() == 1)
 		{
-			app_scene->AddChild(node);
 			base = node;
 		}
 		else 
 		{
 			base->AddChild(node); 
 		}
-	
-		node = rotate(node, 90.0f, vec3(1.0f, 0.0f, 0.0f));
+		quat rotation = glm::angleAxis(90.0f, vec3(1.0f, 0.0f, 0.0f));
+		node->Rotate(node , rotation);
 
-		SceneList.push_back(move(CreateCylinder({ 0, 0, 0 }, 2.0f, 10.0f)));
+		Llist.push_back(move(CreateCylinder(node->GetPosition(), 2.0f, 10.0f)));
+
 
 	}
 
@@ -95,7 +110,8 @@ class LSystem
 		return branches[--array_top]; //bring back the pushed matrix
 	}
 
-	void simulate(){
+	void simulate()
+	{
 		//reset everything and set values
 		modelToWorld = mat4(1.0f);
 		std::vector<int> index;
@@ -123,6 +139,7 @@ class LSystem
 					}
 				}
 
+				
 				index.clear();
 			}
 
@@ -132,11 +149,9 @@ class LSystem
 				//create a cylinder and move up
 				if (axiom[l] == 'F')
 				{
-					if (nodes.size() == 1)
-					{
 						drawBase(&base);
 						modelToWorld = translate(modelToWorld, vec3(0, (branchSize + (branchSize / 2)), 0));
-					}
+				
 				}
 
 				if (axiom[l] == '+')
@@ -178,13 +193,18 @@ class LSystem
 
 				}
 			}
+
+
 		}
 	}
 
 
 
+	void object()
+	{
 
-
-
+		drawBase(&base);
+		//Llist.push_back(move(CreateCylinder({ 0, 12, 0 }, 2.0f, 10.0f)));
+	}
 
 };
