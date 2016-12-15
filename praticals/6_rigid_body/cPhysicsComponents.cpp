@@ -33,13 +33,13 @@ void cParticle::AddLinearImpulse(const glm::dvec3 &v) {
   prev_position = position - newdv;
 }
 
-void cParticle::Integrate(const double dt) {
+void cParticle::Integrate(const double dt, dvec3 gravity) {
   // calcualte velocity from current and previous position
   dvec3 velocity = position - prev_position;
   // set previous position to current position
   prev_position = position;
   // position += v + a * (dt^2)
-  position += velocity + ((forces + GetGravity()) * inversemass) * pow(dt, 2);
+  position += velocity + ((forces + gravity) * inversemass) * pow(dt, 2);
 
   forces = dvec3(0);
   GetParent()->SetPosition(position);
@@ -67,9 +67,9 @@ void cRigidBody::ComputeLocalInvInertiaTensor() {
   worldInvInertia = mat4_cast(orientation) * dmat4(localInvInertia) * transpose(mat4_cast(orientation));
 }
 
-void cRigidBody::Integrate(const double dt) {
+void cRigidBody::Integrate(const double dt, dvec3 gravity) {
   // recycle linear stuff
-  cParticle::Integrate(dt);
+  cParticle::Integrate(dt, gravity);
 
   angVelocity += worldInvInertia * torques * dt;
   angVelocity *= min(pow(angularDamping, dt), 1.0);

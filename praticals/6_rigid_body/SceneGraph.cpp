@@ -21,10 +21,11 @@ public:
 
 	SceneGraph(mat4 modelToWorld)
 	{
-		parent = NULL;
+		parent;
 		localMatrix = modelToWorld;
 		worldMatrix = modelToWorld;
 		rotation;
+		pare = false;
 
 	}
 
@@ -41,10 +42,9 @@ public:
 
 		dvec3 position;
 
-
-		position.x = worldMatrix[0][3];
-		position.y = worldMatrix[1][3];
-		position.z = worldMatrix[2][3];
+		position.x = worldMatrix[3][0];
+		position.y = worldMatrix[3][1];
+		position.z = worldMatrix[3][2];
 
 		return position;
 
@@ -53,10 +53,9 @@ public:
 	// update our scene node
 	void Update()
 	{
-		if (parent) 
+		if (pare == NULL) 
 		{
-			worldMatrix = parent -> worldMatrix * localMatrix;
-			
+			worldMatrix = parent ->worldMatrix * localMatrix;
 		}
 		else 
 		{ 
@@ -85,11 +84,11 @@ public:
 	{
 		nodes.push_back(pNode);
 	}
-	void Rotate(SceneGraph* pNode, dquat rotate)
+	const dquat Rotate(SceneGraph* pNode, dquat rotate)
 	{
 		rotation = mat4_cast(rotate);
 
-		if (parent)
+		if (pare == true)
 		{
 			worldMatrix = parent->worldMatrix * (localMatrix * rotation);
 
@@ -98,11 +97,18 @@ public:
 		{
 			worldMatrix = (localMatrix * rotation);
 		}
+
+		return worldMatrix;
+	}
+	void setParent(SceneGraph* node)
+	{
+		parent = node;
+		pare = true;
 	}
 
 protected:
 	// list of children
-
+	bool pare;
 	std::list<SceneGraph*> nodes;
 	dmat4 localMatrix;
 	dmat4 worldMatrix;

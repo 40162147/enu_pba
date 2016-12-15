@@ -17,7 +17,7 @@ public:
   virtual void SetParent(Entity *p);
   virtual void AddLinearForce(const glm::dvec3 &i);
   virtual void AddLinearImpulse(const glm::dvec3 &i);
-  virtual void Integrate(const double dt);
+  virtual void Integrate(const double dt, const glm::dvec3 gravity);
 
 private:
 };
@@ -38,7 +38,7 @@ public:
   void AddForceAt(const glm::dvec3 &force, const glm::dvec3 &point);
   void AddAngularForce(const glm::dvec3 &i);
   virtual void ComputeLocalInvInertiaTensor();
-  void Integrate(const double dt);
+  void Integrate(const double dt, const glm::dvec3 gravity);
   void SetParent(Entity *p);
 
 private:

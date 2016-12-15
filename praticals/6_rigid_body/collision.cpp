@@ -67,7 +67,7 @@ bool IsCollidingCheck(std::vector<collisionInfo> &civ, const cCylinderCollider &
 
 	*/
 
-
+	
 	// local coords on cylinder rectangle
 	dvec3 points[8] = { dvec3(c1.dia / 2, sp.y + (c1.height / 2), c1.dia / 2), dvec3(-(c1.dia / 2), sp.y + (c1.height / 2), c1.dia / 2),
 						dvec3(c1.dia / 2, sp.y -(c1.height / 2), c1.dia / 2), dvec3(-(c1.dia / 2), sp.y - (c1.height / 2), c1.dia / 2),
@@ -145,7 +145,42 @@ bool IsCollidingCheck(std::vector<collisionInfo> &civ, const cCylinderCollider &
 
 bool IsCollidingCheck(std::vector<collisionInfo> &civ, const cCylinderCollider &c2, const cSphereCollider &c1)
 {
-	return false;
+	
+	const dvec3 sp = c1.GetParent()->GetPosition();
+	const dvec3 pp = c2.GetParent()->GetPosition();
+	const dvec3 vecTemp(pp - sp);
+	
+
+	dvec3 points[8] = { dvec3(c2.dia / 2, sp.y + (c2.height / 2), c2.dia / 2), dvec3(-(c2.dia / 2), sp.y + (c2.height / 2), c2.dia / 2),
+		dvec3(c2.dia / 2, sp.y - (c2.height / 2), c2.dia / 2), dvec3(-(c2.dia / 2), sp.y - (c2.height / 2), c2.dia / 2),
+		dvec3(c2.dia / 2, sp.y + (c2.height / 2), -(c2.dia / 2)), dvec3(-(c2.dia / 2),sp.y + (c2.height / 2), -(c2.dia / 2)),
+		dvec3(c2.dia / 2, sp.y - (c2.height / 2), -(c2.dia / 2)), dvec3(-(c2.dia / 2), sp.y - (c2.height / 2), -(c2.dia / 2)) };
+
+
+	const mat4 m = glm::translate(pp) * mat4_cast(c2.GetParent()->GetRotation());
+	for (int i = 0; i < 8; i++) 
+	{
+		points[i] = dvec3(m * dvec4(points[i], 1.0));
+	}
+
+	// For each point on the cube, which side of cube are they on?
+	double distances[8];
+	bool isCollided = false;
+	for (int i = 0; i < 8; i++) 
+	{
+		
+		distances[i] = dot(sp, vecTemp) - dot(points[i], vecTemp);
+
+		if (distances[i] > 0) 
+		{
+			//	 cout << "CuboidPlane!\n";
+			civ.push_back({ &c1, &c2, points[i] + c1.radius * distances[i], vecTemp, distances[i] });
+			isCollided = true;
+		}
+	}
+
+	return isCollided;
+
 }
 
 

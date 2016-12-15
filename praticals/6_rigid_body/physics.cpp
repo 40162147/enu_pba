@@ -1,14 +1,15 @@
 #include "physics.h"
 #include "cPhysicsComponents.h"
 #include "collision.h"
-
+#include "LSystem.cpp"
 #include <glm/glm.hpp>
 using namespace std;
 using namespace glm;
 static vector<cParticle *> physicsScene;
 static vector<cCollider *> colliders;
 
-static dvec3 gravity = dvec3(0, -10.0, 0);
+static dvec3 gravity = dvec3(0, -9.8, 0);
+static dvec3 gravityo = dvec3(0, 0, 0);
 const double coef = 0.5;
 const double rigidcoef = 0.0;
 
@@ -81,8 +82,18 @@ void UpdatePhysics(const double t, const double dt) {
     }
   }
   // Integrate
-  for (auto &e : physicsScene) {
-    e->Integrate(dt);
+
+  for (auto &e : physicsScene)
+  { 
+	string name = "Cyl";
+	if (e->GetParent()->GetName() != name)
+	{
+		e->Integrate(dt, gravity);
+	}
+	else
+	{
+		e->Integrate(dt, gravityo);
+	}
   }
 }
 

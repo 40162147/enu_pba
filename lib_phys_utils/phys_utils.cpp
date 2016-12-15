@@ -8,6 +8,7 @@ using namespace glm;
 
 namespace phys {
 target_camera cam;
+free_camera cam1;
 effect effP;
 effect effB;
 effect effG;
@@ -230,6 +231,7 @@ void DrawPlane(const glm::vec3 &p0, const glm::vec3 &norm, const glm::vec3 &scal
   renderer::render(geom);
   glEnable(GL_CULL_FACE);
 }
+
 
 void SetCameraPos(const glm::vec3 &p0) {
   cam.set_position(p0);

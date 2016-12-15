@@ -18,9 +18,9 @@ static unique_ptr<Entity> floorEnt;
 LSystem tree;
 
 
-unique_ptr<Entity> CreateParticle() {
+unique_ptr<Entity> CreateParticle(const vec3 &position) {
   unique_ptr<Entity> ent(new Entity());
-  ent->SetPosition(vec3(-2.0, 5.0 + (double)(rand() % 200) / 20.0,2.0));
+  ent->SetPosition(position);
   unique_ptr<Component> physComponent(new cParticle());
   unique_ptr<cShapeRenderer> renderComponent(new cShapeRenderer(cShapeRenderer::SPHERE));
   renderComponent->SetColour(phys::RandomColour());
@@ -42,6 +42,21 @@ unique_ptr<Entity> CreateBox(const vec3 &position) {
   ent->AddComponent(unique_ptr<Component>(move(renderComponent)));
 
   return ent;
+}
+
+unique_ptr<Entity> CreateSphere(const vec3 &position) {
+	unique_ptr<Entity> ent(new Entity());
+	ent->SetPosition(position);
+	ent->SetRotation(angleAxis(0.0f, vec3(1, 0, 0)));
+	unique_ptr<Component> physComponent(new cRigidSphere());
+	unique_ptr<cShapeRenderer> renderComponent(new cShapeRenderer(cShapeRenderer::SPHERE));
+	renderComponent->SetColour(phys::RandomColour());
+	ent->AddComponent(physComponent);
+	ent->SetName("Arsebiscuit");
+	ent->AddComponent(unique_ptr<Component>(new cSphereCollider()));
+	ent->AddComponent(unique_ptr<Component>(move(renderComponent)));
+
+	return ent;
 }
 
 unique_ptr<Entity> CreateCylinder(const vec3 &position, float dia, float height) {
@@ -69,18 +84,41 @@ bool update(double delta_time) {
   static double accumulator = 0.0;
   accumulator += delta_time;
 
+  if (glfwGetKey(renderer::get_window(), GLFW_KEY_W)) 
+  {
+	 
+  }
+  if (glfwGetKey(renderer::get_window(), GLFW_KEY_A))
+  {
 
+  }
+  if (glfwGetKey(renderer::get_window(), GLFW_KEY_S))
+  {
 
+  }
+  if (glfwGetKey(renderer::get_window(), GLFW_KEY_D))
+  {
+
+  }
+  if (glfwGetKey(renderer::get_window(), GLFW_KEY_Q))
+  {
+
+  }
+  if (glfwGetKey(renderer::get_window(), GLFW_KEY_E))
+  {
+
+  }
+ 
   while (accumulator > physics_tick) {
     UpdatePhysics(t, physics_tick);
     accumulator -= physics_tick;
     t += physics_tick;
   }
-
+  
   for (auto &e : Llist) {
     e->Update(delta_time);
   }
-
+  
   phys::Update(delta_time);
   return true;
 }
@@ -90,17 +128,22 @@ bool load_content() {
 
 
  //SceneList.push_back(move(CreateCylinder({ 0, 12, 0 },2.0f, 10.0f)));
-  tree.object();
- //tree.simulate();
- 
- //Llist.push_back(move(CreateParticle()));
-
+ //tree.object();
+ tree.simulate();
+ /*
+ for (auto &e : Llist)
+ {
+	 cout << "hi" << endl;
+ }
+ */
+ Llist.push_back(move(CreateSphere(vec3(30.0f, 1.0f, 0.0f))));
+ Llist[Llist.size() - 1]->getComponent<cRigidSphere>()->AddLinearImpulse(dvec3(10, 10, 0));
 
   floorEnt = unique_ptr<Entity>(new Entity());
   floorEnt->AddComponent(unique_ptr<Component>(new cPlaneCollider()));
   floorEnt->SetName("Floor");
   
-  phys::SetCameraPos(vec3(20.0f, 10.0f, 20.0f));
+  phys::SetCameraPos(vec3(60.0f, 10.0f, 20.0f));
   phys::SetCameraTarget(vec3(0, 10.0f, 0));
   InitPhysics();
   return true;

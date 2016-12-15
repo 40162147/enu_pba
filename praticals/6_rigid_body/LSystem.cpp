@@ -21,16 +21,18 @@ static vector<unique_ptr<Entity>> Llist;
 class LSystem
 {
 
-	int iterations = 4;
+	int iterations = 2;
 	float angle = 22.5f;
+	float anglem = 158.5f;
 	SceneGraph base;
 	std::vector<SceneGraph*> nodes;
 	mat4 modelToWorld;
 	mat4 branches[2048];
-
+	quat rotation;
 	int array_top;
 	float branchSize = 5.0f;
-
+	bool flip = false;
+	bool minusflip = false;
 	std::string axiom = "F";
 	std::string rule1 = "FF-[-F+F+F]+[+F-F-F]";
 
@@ -54,7 +56,7 @@ public:
 	{
 		unique_ptr<Entity> ent(new Entity());
 		ent->SetPosition(position);
-		ent->SetRotation(angleAxis(0.0f, vec3(1, 0, 0)));
+		ent->SetRotation(rotation);
 		ent->SetHeightm(height);
 		ent->SetDiam(dia);
 		unique_ptr<Component> physComponent(new cRigidCylinder());
@@ -82,18 +84,36 @@ public:
 		SceneGraph *node = new SceneGraph(modelToWorld);
 		nodes.push_back(node);
 
-		if (nodes.size() == 1)
+		if (Llist.size() == 0)
 		{
 			base = node;
 		}
 		else 
 		{
 			base->AddChild(node); 
+			node->setParent(base);
+
 		}
-		quat rotation = glm::angleAxis(90.0f, vec3(1.0f, 0.0f, 0.0f));
-		node->Rotate(node , rotation);
+		
+		
+		if(flip == true)
+		{
+			rotation = glm::angleAxis(anglem, vec3(0.0f, 4.0f, 1.0f));
+			flip = false;
+		}
+		else if (minusflip == true)
+		{
+			rotation = glm::angleAxis(angle, vec3(0.0f, 4.0f, 1.0f));
+			minusflip = false;
+		}
+		else
+		{
+			rotation = glm::angleAxis(0.0f, vec3(1.0f, 0.0f, 0.0f));
+		}
+		rotation = node->Rotate(node, rotation);
 
 		Llist.push_back(move(CreateCylinder(node->GetPosition(), 2.0f, 10.0f)));
+		
 
 
 	}
@@ -158,12 +178,18 @@ public:
 				{
 					modelToWorld = rotate(modelToWorld, angle * 4, vec3(0.0f, 1.0f, 0.0f)); //positive rotate in the y-axis
 					modelToWorld = rotate(modelToWorld, angle, vec3(0.0f, 0.0f, 1.0f));  //positive rotate in the z z-axis
+
+					flip = false;
+					minusflip = true;
 				}
 
 				else if (axiom[l] == '-')
 				{
 					modelToWorld = rotate(modelToWorld, -angle * 4, vec3(0.0f, 1.0f, 0.0f)); //positive rotate in the y-axis
 					modelToWorld = rotate(modelToWorld, -angle, vec3(0.0f, 0.0f, 1.0f));  //positive rotate in the z z-axis
+
+					flip = true;
+					minusflip = false;
 				}
 
 				//push the current state of the matrix
@@ -174,6 +200,7 @@ public:
 				//draw leaves and pop the stack back
 				else if (axiom[l] == ']')
 				{
+
 					drawBase(&base); //first draw the pistil (sphere at end of branch)
 					modelToWorld = rotate(modelToWorld, 45.0f, vec3(1.0f, 0.0f, 0.0f));
 					modelToWorld = translate(modelToWorld, vec3(0, (branchSize + (branchSize / 2)), 0));
