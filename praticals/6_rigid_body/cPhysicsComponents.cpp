@@ -166,4 +166,4 @@ void cCollider::Update(double delta) {}
 cSphereCollider::cSphereCollider() : radius(1.0), cCollider("SphereCollider") {}
 cPlaneCollider::cPlaneCollider() : normal(dvec3(0, 1.0, 0)), cCollider("PlaneCollider") {}
 cBoxCollider::cBoxCollider() : radius(1.0), cCollider("BoxCollider") {}
-cCylinderCollider::cCylinderCollider() : dia(), height(), cCollider("CylinderCollider"){}
+cCylinderCollider::cCylinderCollider() : dia(2.0), height(10.0), cCollider("CylinderCollider"){}

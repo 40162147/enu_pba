@@ -236,6 +236,23 @@ void DrawPlane(const glm::vec3 &p0, const glm::vec3 &norm, const glm::vec3 &scal
 void SetCameraPos(const glm::vec3 &p0) {
   cam.set_position(p0);
   PV = cam.get_projection() * cam.get_view();
+  
+}
+
+const glm::dvec3 GetCameraPos()
+{
+	vec3 pos = cam.get_position();
+	return pos;
+}
+
+void SetCameraProjection(float fov ,float aspect, float near, float far) {
+	cam.set_projection(fov, aspect, near, far);
+	PV = cam.get_projection() * cam.get_view();
+}
+
+void Rotate(float delta_yaw, float delta_pitch)
+{
+	
 }
 
 void SetCameraTarget(const glm::vec3 &p0) {

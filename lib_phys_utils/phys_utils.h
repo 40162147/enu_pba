@@ -37,7 +37,10 @@ void DrawScene();
 void Init();
 void Update(double delta_time);
 void SetCameraPos(const glm::vec3 &p0);
+const glm::dvec3 GetCameraPos();
+void SetCameraProjection(float fov, float aspect, float near, float far);
 void SetCameraTarget(const glm::vec3 &p0);
+void Rotate(float delta_yaw, float delta_pitch);
 void DrawLine(const glm::vec3 &p0, const glm::vec3 &p1, const bool depth = true, const RGBAInt32 col = RED);
 void DrawLineCross(const glm::vec3 &p0, float radius = 1.0f, const bool depth = true, const RGBAInt32 col = RED);
 
